@@ -17,6 +17,24 @@ User → Chat UI → Express API → Vector Search → Claude → Response
 - Store embeddings in vector DB
 - Query by semantic similarity
 
+Confluence
+   │
+   ├── /crawl-all
+   │     ├── fetch all pages
+   │     ├── clean HTML
+   │     ├── chunk text
+   │     ├── generate embeddings
+   │     └── store in Vector DB
+   │
+User Question (/chat)
+   │
+   ├── generate embedding
+   ├── vector similarity search
+   ├── retrieve best chunks
+   ├── Claude reasoning
+   └── Final Answer + References
+
+
 ### Phase 3: Intelligent Reasoning
 - Multi-document synthesis
 - Fact extraction
