@@ -13,7 +13,7 @@
             padding: 20px;
         }
 
-        .chat-box {
+        .chatBox {
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
@@ -39,8 +39,18 @@
 
         .message.bot {
             text-align: left;
+            font-size: 14px;
             color: #555;
         }
+
+        .message.bot strong {
+            color: #333;
+        }
+
+        .message.bot em {
+            color: #777;
+        }
+
 
         .input-container {
             display: flex;
@@ -67,7 +77,7 @@
 
 <body>
 
-    <div class="chat-box">
+    <div class="chatBox">
         <div class="messages" id="messages"></div>
         <div class="input-container">
             <input type="text" id="userInput" placeholder="Ask something..." />
@@ -76,33 +86,65 @@
     </div>
 
     <script>
+
         function appendMessage(text, sender) {
             const messageContainer = document.getElementById('messages');
+            if (!messageContainer) return;
+
             const message = document.createElement('div');
             message.classList.add('message', sender);
             message.innerText = text;
+
             messageContainer.appendChild(message);
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
 
-        function sendMessage() {
-            const userInput = document.getElementById('userInput').value;
-            if (!userInput) return;
-            appendMessage(userInput, 'user');
-            document.getElementById('userInput').value = '';
 
-            // Send user input to the server
-            fetch('/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userInput })
+        function appendSources(sources) {
+            if (!sources) return;
+
+            const messageContainer = document.getElementById("messages");
+            if (!messageContainer) {
+                console.error("messages container not found");
+                return;
+            }
+
+            const div = document.createElement("div");
+            div.classList.add("message", "bot");
+
+            div.innerHTML = `strong>Sources:</strong><br>
+        ${sources.replace(/\n/g, "<br>")}`;
+
+            messageContainer.appendChild(div);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+
+        function sendMessage() {
+            const inputEl = document.getElementById("userInput");
+            const userMessage = inputEl.value.trim();
+            if (!userMessage) return;
+
+            appendMessage(userMessage, "user");
+            inputEl.value = "";
+
+            fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: userMessage })   // ✅ FIX #1
             })
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
-                    appendMessage(data.reply, 'bot');
+                    console.log("Chat API response:", data);
+
+                    appendMessage(data.answer || "No answer returned", "bot");
+
+                    if (data.sources && data.sources.length > 0) {
+                        appendSources(data.sources);
+                    }
                 })
                 .catch(err => {
-                    appendMessage('Error: ' + err.message, 'bot');
+                    appendMessage("Error: " + err.message, "bot");
                 });
         }
     </script>
