@@ -77,3 +77,15 @@ http://localhost:3000/crawl-all
 - Embeddings are computed externally using OpenAI
 - LLM reasoning is provided by Claude
 - This phase skips sophisticated chunking, reranking, and caching
+
+## Architecture Overview
+
+See: [ARCHITECTURE.md](./ARCHITECTURE.md)
+
+## Design Overview
+
+See: [DESIGN.md](./DESIGN.md)
+
+## Roadmap
+
+See: [ROADMAP.md](./ROADMAP.md)
