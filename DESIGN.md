@@ -1,29 +1,55 @@
-# Design Decisions
+# Detailed Design
 
-## Why Not Keyword Search?
+## Indexing Pipeline
 
-Keyword search fails when:
-- Terminology varies
-- Knowledge is spread across documents
-- Answers require synthesis
+### Step 1: Confluence Fetch
+- REST API `/content`
+- Pagination using `start + limit`
+- `expand=body.storage`
 
-## Why RAG?
+### Step 2: Content Cleaning
+- Remove HTML tags
+- Normalize whitespaces
+- Remove small content < 200 chars
 
-Retrieval-Augmented Generation allows:
-- Grounded LLM responses
-- Lower hallucination
-- Enterprise trust
+### Step 3: Embedding
+- Model: `OpenAI text-embedding-3-small`
+- Dimensionality: 1536
 
-## Why Separate Crawl and Chat?
+### Step 4: Vector Storage
+- ChromaDB collection
+- Fields: `id`, `document text`, `embedding`, `metadata`(title, URL)
 
-Crawling is:
-- Expensive
-- Slow
-- Offline
+### Query Pipeline
 
-Chat is:
-- Real-time
-- Lightweight
-- Query-only
+1. User submits question
+2. Query -> Embedding
+3. Vector Similarity Search Top-5
+4. Context Concatenation
+5. Prompt Injection into Claude
+6. Answer Generation
+7. Source Attribution
 
-Decoupling enables scalability.
+### Prompt Design
+
+(text)
+Answer the question using ONLY the context below.
+Limit response to 10-100 words.
+
+### Rationale:
+
+- Prevent hallucinations
+- Encourage concise responses
+- Enforce grounding in retrieved data
+
+### Error Handling Strategy
+
+- Empty vector results → user guidance
+- LLM failures → safe fallback message
+- Server errors → HTTP 500
+
+### Security Considerations
+
+- Secrets stored in .env
+- .env excluded from Git
+- Server-side API calls only
