@@ -1,4 +1,4 @@
-# Confluence AI Knowledge Assistant Roadmap
+## Roadmap
 
 ## Phase 1: VectorDB + RAG Foundation ✅
 - [x] Confluence crawling & HTML stripping
